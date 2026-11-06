@@ -1,0 +1,13 @@
+# 构建产物
+/netkit-linux*
+/netkit.exe
+/netkit-v*
+/dist/
+
+# 运行时数据（含密码，勿上传）
+/netkit.conf
+/geo/
+*.log
+
+# 测试临时目录
+/testdir/

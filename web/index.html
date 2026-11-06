@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NetKit - 网络工具箱</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+<!-- 登录页：未来科技 · 液态视图 -->
+<div id="login-page" class="login-page hidden">
+  <!-- 液态流体背景 + 网格 -->
+  <div class="lx-bg" aria-hidden="true">
+    <span class="lx-blob b1"></span>
+    <span class="lx-blob b2"></span>
+    <span class="lx-blob b3"></span>
+    <span class="lx-blob b4"></span>
+    <div class="lx-grid"></div>
+  </div>
+
+  <div class="theme-toggle">
+    <button id="login-theme-btn" class="lx-icon-btn" title="切换明暗" onclick="toggleTheme()">☀</button>
+  </div>
+
+  <div class="lx-shell">
+    <!-- 操作区：账号 / 密码 -->
+    <div class="lx-main">
+      <form class="lx-form" id="login-step1" onsubmit="event.preventDefault(); $('#login-btn').click();">
+        <div class="lx-brand">
+          <div class="lx-logo"><span>N</span></div>
+          <div>
+            <h2 class="lx-title">NetKit</h2>
+            <p class="lx-sub">多合一网络工具箱 · SECURE ACCESS</p>
+          </div>
+        </div>
+
+        <label class="lx-field">
+          <svg class="lx-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.4 4.4 0 1 0 0-8.8 4.4 4.4 0 0 0 0 8.8Zm0 2.2c-4.4 0-8 2.2-8 4.9v1.7h16v-1.7c0-2.7-3.6-4.9-8-4.9Z"/></svg>
+          <input id="login-user" class="lx-input" placeholder="账号" autocomplete="username">
+        </label>
+
+        <label class="lx-field">
+          <svg class="lx-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5.8A1.8 1.8 0 0 0 4 10.8v9.4c0 1 .8 1.8 1.8 1.8h12.4c1 0 1.8-.8 1.8-1.8v-9.4c0-1-.8-1.8-1.8-1.8H17Zm-2 0H9V7a3 3 0 0 1 6 0v2Z"/></svg>
+          <input id="login-pass" class="lx-input" type="password" placeholder="密码" autocomplete="current-password">
+        </label>
+
+        <button id="login-btn" class="lx-btn" type="button">
+          <span class="lx-btn-label">登 录</span>
+          <span class="lx-btn-load" aria-hidden="true"></span>
+        </button>
+        <p class="lx-hint">管理员拥有全部功能 · 后备账号仅可备份与还原配置</p>
+      </form>
+
+      <!-- 第二步：两步验证 -->
+      <form class="lx-form is-hidden" id="login-step2" onsubmit="event.preventDefault(); $('#login-verify-btn').click();">
+        <div class="lx-brand">
+          <div class="lx-logo lx-logo--code"><span>2FA</span></div>
+          <div>
+            <h2 class="lx-title">两步验证</h2>
+            <p class="lx-sub">输入验证器 App 中的 6 位动态验证码</p>
+          </div>
+        </div>
+
+        <label class="lx-field lx-field--code">
+          <input id="login-code" class="lx-input lx-input--code" inputmode="numeric" maxlength="7" placeholder="000 000" autocomplete="one-time-code">
+        </label>
+
+        <button id="login-verify-btn" class="lx-btn" type="button">
+          <span class="lx-btn-label">验 证</span>
+          <span class="lx-btn-load" aria-hidden="true"></span>
+        </button>
+        <button id="login-toggle-recovery" class="lx-link" type="button">使用恢复码登录</button>
+
+        <div id="login-recovery-box" class="is-hidden lx-recovery">
+          <label class="lx-field">
+            <input id="login-recovery" class="lx-input" placeholder="XXXX-XXXX-XXXX" style="text-transform:uppercase">
+          </label>
+          <button id="login-recovery-btn" class="lx-btn lx-btn--ghost" type="button">
+            <span class="lx-btn-label">用恢复码登录</span>
+            <span class="lx-btn-load" aria-hidden="true"></span>
+          </button>
+        </div>
+        <button id="login-back" class="lx-link" type="button">返回上一步</button>
+      </form>
+
+      <!-- AI 全息机械手：点击登录时"伸手按压" -->
+      <div class="lx-ai" aria-hidden="true">
+        <svg class="lx-hand" viewBox="0 0 160 200">
+          <g class="lx-hand-g">
+            <path d="M150 196 L118 138 Q112 126 124 120 Q136 115 142 127 L160 172 Z"/>
+            <circle cx="122" cy="126" r="9"/>
+            <rect x="62" y="86" width="56" height="50" rx="18" transform="rotate(-12 90 111)"/>
+            <rect x="16" y="74" width="56" height="19" rx="9.5" transform="rotate(-14 44 83)"/>
+            <rect x="86" y="72" width="34" height="15" rx="7.5" transform="rotate(-14 103 79)"/>
+            <rect x="90" y="90" width="32" height="15" rx="7.5" transform="rotate(-10 106 97)"/>
+            <rect x="66" y="126" width="38" height="17" rx="8.5" transform="rotate(34 85 134)"/>
+            <circle class="node" cx="66" cy="88" r="4.5"/>
+            <circle class="node" cx="98" cy="118" r="4.5"/>
+            <circle class="node" cx="122" cy="126" r="4.5"/>
+            <path class="wire" d="M150 190 L128 150 M104 100 L78 92"/>
+          </g>
+        </svg>
+        <!-- 数据流粒子：从手部涌向登录按钮 -->
+        <span class="lx-dot d1"></span>
+        <span class="lx-dot d2"></span>
+        <span class="lx-dot d3"></span>
+      </div>
+    </div>
+
+    <!-- 展示区：AI 全息核心 -->
+    <aside class="lx-side">
+      <div class="lx-core" aria-hidden="true">
+        <span class="lx-ring r1"></span>
+        <span class="lx-ring r2"></span>
+        <span class="lx-ring r3"></span>
+        <span class="lx-core-inner">AI</span>
+      </div>
+      <h2 class="lx-side-title">欢迎回来</h2>
+      <p class="lx-side-desc">登录后可管理端口转发、反向代理、动态域名、证书、WAF 与计划任务</p>
+      <div class="lx-feats">
+        <span>端口转发</span><span>反向代理</span><span>DDNS</span><span>SSL 证书</span><span>WAF</span><span>计划任务</span>
+      </div>
+      <div class="lx-term">
+        <div><i class="ok"></i>SECURE CHANNEL ESTABLISHED</div>
+        <div><i class="ok"></i>TLS CERTIFICATE VALID</div>
+        <div><i class="blink"></i>AWAITING CREDENTIALS_</div>
+      </div>
+    </aside>
+  </div>
+
+  <p id="login-err" class="lx-err"></p>
+</div>
+
+<!-- 主界面 -->
+<div id="app" class="layout hidden">
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="brand-mark">
+      <div class="brand-logo">N</div>
+      <div class="brand-text">
+        <div class="n">NetKit</div>
+        <div class="v">v0.3.0</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="theme-btn" title="切换明暗主题" onclick="toggleTheme()">☀</button>
+    <div class="user-pill" id="user-pill" title="账号设置" role="button" tabindex="0">
+      <div class="user-avatar">N</div>
+      <div class="user-name">NetKit Admin</div>
+    </div>
+    <button class="icon-btn" id="logout-btn" title="退出登录">⏻</button>
+  </header>
+
+  <!-- 侧栏 -->
+  <aside class="sidebar">
+    <div class="nav-group-label">监控</div>
+    <nav id="nav">
+      <a data-page="dashboard" class="active"><span class="ico">▦</span>总览</a>
+      <a data-page="bigscreen"><span class="ico">▣</span>数据大屏</a>
+      <a data-page="logcenter"><span class="ico">▤</span>日志中心</a>
+    </nav>
+    <div class="nav-group-label">网络</div>
+    <nav id="nav2">
+      <a data-page="portforward"><span class="ico">⇄</span>端口转发</a>
+      <a data-page="webproxy"><span class="ico">◎</span>Web 服务</a>
+      <a data-page="ddns"><span class="ico">⟳</span>动态域名</a>
+    </nav>
+    <div class="nav-group-label">安全</div>
+    <nav id="nav3">
+      <a data-page="ipdb"><span class="ico">◫</span>IP 地址库</a>
+      <a data-page="secgroup"><span class="ico">⛨</span>安全组</a>
+      <a data-page="ipfilter"><span class="ico">⚑</span>IP 过滤</a>
+      <a data-page="honeypot"><span class="ico">☗</span>蜜罐诱捕</a>
+      <a data-page="ipvisitors"><span class="ico">◎</span>IP 访客</a>
+      <a data-page="waf"><span class="ico">⛨</span>WAF 防火墙</a>
+      <a data-page="ssl"><span class="ico">✉</span>证书</a>
+    </nav>
+    <div class="nav-group-label">系统</div>
+    <nav id="nav4">
+      <a data-page="cron"><span class="ico">⏱</span>计划任务</a>
+      <a data-page="ai"><span class="ico">✦</span>AI 维护</a>
+      <a data-page="settings"><span class="ico">⚙</span>设置</a>
+    </nav>
+    <div class="sidebar-foot">
+      <button id="logout-btn2" class="btn ghost block">退出登录</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- 总览 -->
+    <section id="page-dashboard" class="page">
+      <div class="page-head">
+        <h2>总览</h2>
+      </div>
+
+      <!-- 巨型指挥工作台 -->
+      <div class="hq">
+        <div class="hq-main">
+          <canvas id="hq-wave"></canvas>
+          <div class="hq-brand">
+            <div class="hq-title">NETKIT // COMMAND</div>
+            <div class="hq-sub"><span class="hq-led"></span><span id="hq-status">SYSTEM ONLINE</span></div>
+          </div>
+          <div class="hq-metrics" id="hq-metrics"></div>
+          <div class="hq-core">
+            <svg class="hq-ring" viewBox="0 0 140 140" aria-hidden="true">
+              <circle class="ring-tick" cx="70" cy="70" r="66"/>
+              <circle class="ring-bg" cx="70" cy="70" r="58"/>
+              <circle class="ring-fg" id="hq-ring-fg" cx="70" cy="70" r="58"/>
+            </svg>
+            <div class="hq-score"><b id="hq-score-num">--</b><span>健康评分</span></div>
+          </div>
+        </div>
+        <div class="hq-side" id="hq-side"></div>
+      </div>
+
+      <p class="hint">各功能模块的运行概况（点击卡片进入对应模块）。</p>
+      <div class="cards" id="dash-cards"></div>
+      <h3>运行信息</h3>
+      <table class="kv" id="dash-info"></table>
+    </section>
+
+    <!-- 数据大屏 -->
+    <section id="page-bigscreen" class="page hidden">
+      <div class="bs-head">
+        <div class="bs-title">NETKIT <span>// 数据大屏</span></div>
+        <div class="bs-clock" id="bs-clock">--:--:--</div>
+        <div class="bs-head-acts">
+          <span class="bs-live"><i></i>LIVE</span>
+          <button class="btn sm" id="bs-fs">⛶ 全屏</button>
+        </div>
+      </div>
+
+      <div class="bs-kpis" id="bs-kpis"></div>
+
+      <div class="bs-grid">
+        <div class="bs-panel bs-trend">
+          <h4>24 小时请求趋势 <span id="bs-trend-peak" class="bs-hint"></span></h4>
+          <div class="bs-bars" id="bs-hourly"></div>
+          <div class="bs-axis" id="bs-hourly-axis"></div>
+        </div>
+        <div class="bs-panel bs-status">
+          <h4>状态码分布</h4>
+          <div id="bs-scode"></div>
+        </div>
+        <div class="bs-panel bs-sys">
+          <h4>运行状态</h4>
+          <div id="bs-sys"></div>
+        </div>
+        <div class="bs-panel bs-hp">
+          <h4>蜜罐诱捕 <span class="bs-hint" id="bs-hp-hint"></span></h4>
+          <div id="bs-honeypot"></div>
+        </div>
+        <div class="bs-panel bs-geo">
+          <h4>访客地区分布 <span class="bs-hint" id="bs-geo-hint"></span></h4>
+          <div id="bs-geo"></div>
+        </div>
+        <div class="bs-panel bs-domains">
+          <h4>热门域名 TOP</h4>
+          <div id="bs-domains"></div>
+        </div>
+        <div class="bs-panel bs-paths">
+          <h4>热门路径 TOP</h4>
+          <div id="bs-paths"></div>
+        </div>
+        <div class="bs-panel bs-logs">
+          <h4>实时访问日志 <span class="bs-hint">最新在前</span></h4>
+          <div id="bs-logs" class="bs-loglist"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 日志中心 -->
+    <section id="page-logcenter" class="page hidden">
+      <div class="page-head">
+        <h2>日志中心</h2>
+        <div class="actions">
+          <button class="btn" onclick="clearLogs()">清空日志</button>
+        </div>
+      </div>
+      <p class="hint">各模块运行日志汇总，可按模块、级别与关键字过滤。</p>
+      <div class="mod-hero fx-matrix" aria-hidden="true">
+        <div class="rain" id="matrix-rain"></div>
+        <div class="hero-tag"><b>LOG STREAM</b><span>数据瀑布 · 蓝=Info 黄=Warn 红=Error</span></div>
+      </div>
+      <div class="logfilter">
+        <select id="lg-module"><option value="">全部模块</option></select>
+        <select id="lg-level">
+          <option value="">全部级别</option>
+          <option value="info">info</option>
+          <option value="warn">warn</option>
+          <option value="error">error</option>
+        </select>
+        <input id="lg-kw" placeholder="关键字过滤">
+        <button class="btn sm" onclick="loadLogs()">查询</button>
+        <label class="checkline" style="display:flex;align-items:center;gap:6px;color:var(--text-muted)">
+          <input type="checkbox" id="lg-auto" style="accent-color:var(--accent)"> 实时刷新
+        </label>
+      </div>
+      <pre class="logs" id="lg-list" style="max-height:58vh"></pre>
+    </section>
+
+    <!-- 端口转发 -->
+    <section id="page-portforward" class="page hidden">
+      <div class="page-head">
+        <h2>端口转发</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="pfEdit()">添加转发规则</button>
+        </div>
+      </div>
+      <p class="hint">公网 IPv6/IPv4 端口转发到内网 IPv4 服务，支持 TCP / UDP。</p>
+      <div class="mod-hero fx-pf" aria-hidden="true">
+        <canvas id="pf-fx"></canvas>
+        <div class="hero-tag"><b>DATA PIPELINE</b><span>流光管道 · 蓝=TCP 紫=UDP · 光点即转发流</span></div>
+      </div>
+      <div class="group-bar" id="pf-groupbar"></div>
+      <div id="pf-list"></div>
+    </section>
+
+    <!-- Web 服务 -->
+    <section id="page-webproxy" class="page hidden">
+      <div class="page-head">
+        <h2>Web 服务</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="webEdit()">添加 Web 规则</button>
+        </div>
+      </div>
+      <p class="hint">反向代理：按前端域名分流到不同后端，支持轮询负载均衡、BasicAuth、安全组与 Coraza WAF。</p>
+      <div class="mod-hero fx-proxy" aria-hidden="true">
+        <canvas id="proxy-fx"></canvas>
+        <div class="hero-tag"><b>REQUEST ROUTER</b><span>请求路由 · 光点按轮询分发，命中后端即闪亮</span></div>
+      </div>
+      <div class="group-bar" id="web-groupbar"></div>
+      <div id="web-list"></div>
+    </section>
+
+    <!-- DDNS -->
+    <section id="page-ddns" class="page hidden">
+      <div class="page-head">
+        <h2>动态域名</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="ddnsEdit()">添加任务</button>
+        </div>
+      </div>
+      <p class="hint">定时把本机公网 IP 同步到 DNS 服务商，支持 Cloudflare / DNSPod(腾讯云) / 阿里云。</p>
+      <div class="mod-hero fx-ddns" aria-hidden="true">
+        <div class="ddns-flow">
+          <span class="dn-node">DOMAIN</span>
+          <span class="dn-line"><i></i><i></i></span>
+          <span class="dn-node flip" id="ddns-hero-count">0</span>
+        </div>
+        <div class="hero-tag"><b>SYNC PULSE</b><span>脉冲抵达即解析成功 · 数字为同步任务数</span></div>
+      </div>
+      <div class="group-bar" id="ddns-groupbar"></div>
+      <div id="ddns-list"></div>
+    </section>
+
+    <!-- 证书 -->
+    <section id="page-ssl" class="page hidden">
+      <div class="page-head">
+        <h2>证书</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="sslEdit()">申请证书</button>
+        </div>
+      </div>
+      <p class="hint">通过 Let's Encrypt (HTTP-01) 自动申请域名证书。申请时本机 80 端口需能被公网访问到 NetKit。</p>
+      <div class="mod-hero fx-ssl" aria-hidden="true">
+        <svg class="ssl-lock" viewBox="0 0 120 120">
+          <circle class="sl-ringbg" cx="60" cy="60" r="52"/>
+          <circle class="sl-ring" cx="60" cy="60" r="52"/>
+          <circle class="sl-orbit o1" cx="60" cy="60" r="44"/>
+          <circle class="sl-orbit o2" cx="60" cy="60" r="36"/>
+          <rect class="sl-body" x="42" y="56" width="36" height="30" rx="5"/>
+          <path class="sl-shackle" d="M48 56 V47 a12 12 0 0 1 24 0 V56"/>
+          <circle class="sl-key" cx="60" cy="69" r="4"/>
+          <rect class="sl-slot" x="58.5" y="71" width="3" height="9" rx="1.5"/>
+        </svg>
+        <div class="hero-tag"><b>TRUST CHAIN</b><span>信任光环 · 双轨道扫描即证书链巡检</span></div>
+      </div>
+      <div id="ssl-list"></div>
+    </section>
+
+    <!-- 计划任务 -->
+    <section id="page-cron" class="page hidden">
+      <div class="page-head">
+        <h2>计划任务</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="cronEdit()">添加任务</button>
+        </div>
+      </div>
+      <p class="hint">5 段 cron 表达式（分 时 日 月 周），如 <code>*/5 * * * *</code> 每 5 分钟，<code>30 8 * * 1-5</code> 工作日 8:30。</p>
+      <div class="mod-hero fx-cron" aria-hidden="true">
+        <div class="gear g1">⚙</div>
+        <div class="gear g2">⚙</div>
+        <div class="cron-timeline"><span class="ct-line"></span><i style="--d:0s"></i><i class="busy" style="--d:.4s"></i><i style="--d:.8s"></i><i style="--d:1.2s"></i><i style="--d:1.6s"></i></div>
+        <div class="hero-tag"><b>TIMELINE</b><span>齿轮恒动 · 节点呼吸即任务就绪</span></div>
+      </div>
+      <div id="cron-list"></div>
+    </section>
+
+    <!-- IP 地址库 -->
+    <section id="page-ipdb" class="page hidden">
+      <div class="page-head">
+        <h2>IP 地址库</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="ipdbEdit()">添加条目</button>
+        </div>
+      </div>
+      <p class="hint">维护 IP / CIDR 地址条目（可加备注与有效期），供安全组引用。</p>
+      <div class="mod-hero fx-radar" aria-hidden="true">
+        <div class="radar">
+          <span class="rr r1"></span><span class="rr r2"></span><span class="rr r3"></span>
+          <span class="rsweep"></span>
+          <span class="blip b1"></span><span class="blip b2"></span><span class="blip b3"></span>
+        </div>
+        <div class="hero-tag"><b>GEO SCAN</b><span>雷达扫描 · 亮点即地址库命中</span></div>
+      </div>
+      <div id="ipdb-list"></div>
+    </section>
+
+    <!-- 安全组 -->
+    <section id="page-secgroup" class="page hidden">
+      <div class="page-head">
+        <h2>安全组</h2>
+        <div class="actions">
+          <button class="btn primary" onclick="sgEdit()">添加安全组</button>
+        </div>
+      </div>
+      <p class="hint">把地址库条目组成一组并指定白/黑名单模式，可在 Web 服务子规则和全局 IP 过滤中引用。</p>
+      <div class="mod-hero fx-hive" aria-hidden="true">
+        <div class="hive">
+          <span style="--d:0s"></span><span style="--d:.5s"></span><span style="--d:1s"></span>
+          <span style="--d:1.5s"></span><span style="--d:2s"></span><span style="--d:2.5s"></span>
+          <span style="--d:3s"></span>
+        </div>
+        <div class="hero-tag"><b>HIVE PERIMETER</b><span>蜂巢边界 · 涟漪即流量穿行</span></div>
+      </div>
+      <div id="sg-list"></div>
+    </section>
+
+    <!-- IP 过滤 -->
+    <section id="page-ipfilter" class="page hidden">
+      <div class="page-head">
+        <h2>IP 过滤</h2>
+      </div>
+      <p class="hint">引用安全组对访问做全局控制，可作用于后台管理访问与转发/反代入站。本机回环地址始终放行。</p>
+      <div class="mod-hero fx-filter" aria-hidden="true">
+        <canvas id="filter-fx"></canvas>
+        <div class="hero-tag"><b>FILTER GRID</b><span>光栅过滤 · 白名单穿透 / 黑名单粉碎</span></div>
+      </div>
+      <div class="panel-duo">
+        <div class="panel">
+          <label>过滤模式
+            <select id="gf-mode">
+              <option value="none">不过滤</option>
+              <option value="white">白名单（仅名单内可访问）</option>
+              <option value="black">黑名单（名单内拒绝）</option>
+            </select>
+          </label>
+          <label>生效安全组（可多选）
+            <select id="gf-groups" multiple size="6" style="height:auto"></select>
+          </label>
+          <label class="checkline" style="display:flex;align-items:center;gap:8px;color:var(--text)">
+            <input type="checkbox" id="gf-admin" style="width:auto;margin:0;accent-color:var(--accent)">
+            应用于后台管理访问（谨慎开启，确认自己的 IP 在白名单内）
+          </label>
+          <button class="btn primary" onclick="saveIPFilter()">保存</button>
+          <p id="gf-msg" class="hint"></p>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-top:0">区域拦截（GeoIP 国家/地区）</h3>
+          <p class="hint" style="margin:2px 0 10px">按访客公网 IP 的归属国家/地区全局过滤，作用于转发/反代入站；与黑白名单独立生效，本机回环与内网地址不受影响。</p>
+          <label>拦截模式
+            <select id="gf-geomode">
+              <option value="">停用</option>
+              <option value="block">拦截（名单内国家拒绝访问）</option>
+              <option value="allow">放行白名单（仅名单内国家可访问，其余拦截）</option>
+              <option value="detect">仅记录（命中写入日志，不拦截）</option>
+            </select>
+          </label>
+          <label style="margin-bottom:6px">已选国家/地区（ISO 3166-1 二位码）</label>
+          <div id="gf-geo-picked"></div>
+          <label style="margin-top:12px">快速添加（可多选）
+            <select id="gf-geo-pool" multiple size="8" style="height:auto"></select>
+          </label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
+            <button class="btn sm" onclick="geoAddSel()">添加选中</button>
+            <input id="gf-geo-code" placeholder="自定义码，如 KP" maxlength="2"
+              style="width:130px;text-transform:uppercase">
+            <button class="btn sm" onclick="geoAddCode()">添加</button>
+          </div>
+          <p class="hint" style="margin:6px 0 0">在上方列表选中国家后点「添加选中」才会进入名单；<b>名单为空时任何模式都不会生效</b>。</p>
+          <p id="gf-geo-status" class="hint" style="margin-top:10px"></p>
+          <button class="btn primary" style="margin-top:10px" onclick="saveGeo()">保存区域拦截</button>
+          <p id="gf-geo-msg" class="hint"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 蜜罐诱捕 -->
+    <section id="page-honeypot" class="page hidden">
+      <div class="page-head">
+        <h2>蜜罐诱捕</h2>
+        <div class="actions">
+          <button class="btn" onclick="loadHoneypotLogs()">刷新记录</button>
+          <button class="btn danger" onclick="clearHoneypotLogs()">清空记录</button>
+        </div>
+      </div>
+      <p class="hint">开放诱饵端口，捕获扫描器与入侵尝试：按服务模板伪装成 FTP/Telnet/SSH/Web/Redis/MySQL/RDP 等真实服务，诱导交互并捕获登录凭据与指令；Web 请求识别 AI Agent 与扫描器 UA，命中后经全局通知告警（同一 IP 5 分钟节流）。</p>
+      <div class="mod-hero fx-hp" aria-hidden="true">
+        <canvas id="hp-fx"></canvas>
+        <div class="hero-tag"><b>HONEYPOT NET</b><span>诱捕网 · 红色探针撞击诱饵端口即被捕获</span></div>
+      </div>
+      <div class="panel" style="max-width:100%">
+        <div class="waf-row">
+          <label class="checkline"><input type="checkbox" id="hp-enabled"> 启用蜜罐诱捕</label>
+          <span id="hp-geo" class="hint"></span>
+        </div>
+        <p class="hint" id="hp-reserved" style="margin:4px 0 0"></p>
+        <div id="hp-list" style="margin-top:10px"></div>
+        <button class="btn primary" style="margin-top:10px" onclick="hpEdit()">添加诱饵端口</button>
+        <button class="btn" style="margin-top:10px" onclick="saveHoneypot()">保存蜜罐设置</button>
+        <p id="hp-msg" class="hint"></p>
+      </div>
+      <div id="hp-stats" style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 8px"></div>
+      <h3>诱捕记录</h3>
+      <div id="hp-records" style="max-height:360px;overflow:auto"></div>
+      <h3>事件日志</h3>
+      <pre class="logs" id="hp-logs" style="max-height:220px">暂无日志</pre>
+    </section>
+
+    <!-- IP 访客（地区显示） -->
+    <section id="page-ipvisitors" class="page hidden">
+      <div class="page-head">
+        <h2>IP 访客</h2>
+        <div class="actions">
+          <button class="btn" onclick="loadIPVisitors()">刷新</button>
+          <button class="btn danger" onclick="clearIPVisitors()">清空</button>
+        </div>
+      </div>
+      <p class="hint">所有出现过的来源 IP 及其国家/地区（来自全局 IP 过滤、Web 服务及其子规则、端口转发、WAF 拦截与蜜罐捕获），内存登记、重启清空。放行/拦截标记按当前全局 IP 过滤规则（区域 + 黑白名单）实时判定。</p>
+      <div class="mod-hero fx-ipv" aria-hidden="true">
+        <canvas id="ipv-fx"></canvas>
+        <div class="hero-tag"><b>VISITOR FLOW</b><span>访客汇聚 · 来访光点汇入中枢并归档到地区节点</span></div>
+      </div>
+      <div class="logfilter">
+        <select id="ipv-cc"><option value="">全部国家/地区</option></select>
+        <input id="ipv-kw" placeholder="IP 关键字">
+        <button class="btn sm" onclick="loadIPVisitors()">查询</button>
+        <span class="hint" id="ipv-total"></span>
+      </div>
+      <div class="panel" style="max-width:100%">
+        <div id="ipv-aggs" class="hint" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+      <div id="ipv-list" style="margin-top:10px"></div>
+    </section>
+
+    <!-- WAF -->
+    <section id="page-waf" class="page hidden">
+      <div class="page-head">
+        <h2>WAF 防火墙</h2>
+        <div class="actions">
+          <button class="btn" onclick="loadWAFHits()">刷新命中</button>
+          <button class="btn danger" onclick="clearWAFHits()">清空命中</button>
+        </div>
+      </div>
+      <p class="hint">基于 Coraza（OWASP CRS 引擎）的 Web 应用防火墙。开启后，在 Web 服务规则里勾选"启用 WAF"的规则才会受保护。</p>
+
+      <!-- 巨盾防御动效 -->
+      <div class="shield-stage" id="shield-stage">
+        <canvas id="shield-fx"></canvas>
+        <svg class="shield-svg" viewBox="0 0 120 132" aria-hidden="true">
+          <path class="sh-outer" d="M60 5 L113 25 V66 C113 98 91 120 60 130 C29 120 7 98 7 66 V25 Z"/>
+          <path class="sh-inner" d="M60 16 L103 32 V66 C103 92 85 110 60 119 C35 110 17 92 17 66 V32 Z"/>
+          <path class="sh-mark" d="M42 65 L55 78 L80 51"/>
+        </svg>
+        <div class="shield-state">
+          <b id="shield-title">SHIELD ACTIVE</b>
+          <span id="shield-mode">防护引擎待命</span>
+        </div>
+        <div class="shield-num"><b id="shield-count">0</b><span>ATTACKS BLOCKED · 攻击已拦截</span></div>
+      </div>
+
+      <div class="panel" style="max-width:100%">
+        <div class="waf-row">
+          <label class="checkline"><input type="checkbox" id="waf-enabled"> 启用 WAF 总开关</label>
+          <label class="checkline"><input type="checkbox" id="waf-admin"> 防护后台管理自身（谨慎开启）</label>
+        </div>
+        <label>工作模式
+          <select id="waf-mode">
+            <option value="block">拦截模式（命中即 403 阻断）</option>
+            <option value="detect">仅记录模式（只记日志不阻断）</option>
+          </select>
+        </label>
+        <div class="waf-row">
+          <label>请求体检测上限（KB） <input id="waf-maxbody" type="number" min="1" value="128"></label>
+          <label>频率限制（次/分钟/IP，0=不限制） <input id="waf-ratelimit" type="number" min="0" value="0"></label>
+        </div>
+        <label>信任 IP / 网段（跳过 WAF 检测，每行一条） <textarea id="waf-trusted" rows="2"></textarea></label>
+
+        <h4>内置规则集</h4>
+        <div id="waf-rulesets" class="waf-rulesets"></div>
+
+        <h4>自定义规则（SecRule 语法，追加在内置规则之后）</h4>
+        <textarea id="waf-extra" rows="6" placeholder="SecRule REQUEST_URI &quot;@contains /admin&quot; &quot;id:2001,phase:1,deny,status:403,msg:'禁止访问 admin'&quot;"></textarea>
+
+        <h4>规则源自动更新（定时拉取远程 Coraza 规则文件）</h4>
+        <div class="waf-row">
+          <label class="checkline"><input type="checkbox" id="waf-autoupd"> 启用自动更新</label>
+          <label class="feed-hours">检查间隔（小时）
+            <input id="waf-feed-hours" type="number" min="1" max="720" value="24">
+          </label>
+        </div>
+        <label>规则源地址（兼容 Coraza 语法的 .conf 文件 URL，http/https）
+          <input id="waf-feed-url" placeholder="https://example.com/rules/coraza-rules.conf">
+        </label>
+        <div class="waf-actions">
+          <button class="btn" onclick="updateWAFRules()">立即更新</button>
+          <span id="waf-feed-status" class="hint"></span>
+        </div>
+
+        <div class="waf-actions">
+          <button class="btn primary" onclick="saveWAF()">保存并生效</button>
+          <span id="waf-msg" class="hint"></span>
+        </div>
+      </div>
+
+      <h3>规则测试</h3>
+      <p class="hint">输入一个 URI 与 User-Agent，用当前规则实时试跑，确认是否会被拦截。</p>
+      <div class="panel" style="max-width:100%">
+        <label>请求 URI <input id="waf-test-uri" value="/?id=1 union select 1"></label>
+        <label>User-Agent <input id="waf-test-ua" value="Mozilla/5.0"></label>
+        <button class="btn" onclick="testWAF()">测试这条请求</button>
+        <p id="waf-test-result" class="hint"></p>
+      </div>
+
+      <h3>拦截记录</h3>
+      <pre class="logs" id="waf-hits" style="max-height:320px"></pre>
+    </section>
+
+    <!-- AI 维护 -->
+    <section id="page-ai" class="page hidden">
+      <div class="page-head">
+        <h2>AI 维护</h2>
+      </div>
+
+      <p class="hint">接入 OpenAI 兼容大模型（DeepSeek / 通义千问 / Kimi / OpenAI / 本地 Ollama），基于实时系统上下文做体检与运维问答。</p>
+
+      <!-- AI 状态条：旋转核心环 + 关键事实 -->
+      <div class="ai-hero">
+        <div class="ai-core" aria-hidden="true">
+          <span class="ai-ring r1"></span>
+          <span class="ai-ring r2"></span>
+          <span class="ai-core-in">✦</span>
+        </div>
+        <div class="ai-facts">
+          <div class="ai-fact">
+            <span class="l">SERVICE</span>
+            <span class="v"><i class="dot off" id="ai-dot"></i><span id="ai-st-state">未启用</span></span>
+          </div>
+          <div class="ai-fact">
+            <span class="l">MODEL</span>
+            <span class="v mono" id="ai-st-model">--</span>
+          </div>
+          <div class="ai-fact">
+            <span class="l">ENDPOINT</span>
+            <span class="v mono" id="ai-st-url">--</span>
+          </div>
+          <div class="ai-fact">
+            <span class="l">LATENCY</span>
+            <span class="v mono" id="ai-st-rtt">-- ms</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-grid">
+        <!-- 模型配置 -->
+        <div class="panel">
+          <div class="p-head">
+            <span class="p-ico">⚙</span>
+            <div class="p-t">
+              <h3>模型配置</h3>
+              <p class="hint">填写后可先「测试连接」，未保存也能测</p>
+            </div>
+            <span class="p-tag">CONFIG</span>
+          </div>
+          <label class="checkline"><input type="checkbox" id="ai-enabled"> 启用 AI 大模型维护</label>
+          <label>模型服务地址 BaseURL <input id="ai-baseurl" placeholder="https://api.deepseek.com/v1"></label>
+          <label>API Key <input id="ai-key" type="password" placeholder="留空则保留已保存的 Key"></label>
+          <label>模型名称 <input id="ai-model" placeholder="deepseek-chat"></label>
+          <label>HTTP 代理（可选） <input id="ai-proxy" placeholder="http://127.0.0.1:7890（出网受限时填写）"></label>
+          <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+            <button class="btn primary" id="ai-save-btn" onclick="saveAIConfig()">保存配置</button>
+            <button class="btn" id="ai-test-btn" onclick="testAIConn()">测试连接</button>
+          </div>
+          <p id="ai-cfg-msg" class="hint"></p>
+          <p class="hint">API Key 明文保存在本地配置文件（会随配置备份导出），请妥善保管。</p>
+        </div>
+
+        <!-- 一键体检 -->
+        <div class="panel">
+          <div class="p-head">
+            <span class="p-ico">⊕</span>
+            <div class="p-t">
+              <h3>一键体检</h3>
+              <p class="hint">聚合端口转发、Web 服务、WAF、蜜罐、证书、过滤与最近告警日志等实时状态，交给模型生成健康报告与维护建议</p>
+            </div>
+            <span class="p-tag">CHECKUP</span>
+          </div>
+          <button class="btn primary" id="ai-checkup-btn" onclick="aiCheckup()">开始体检</button>
+          <div class="ai-progress hidden" id="ai-checkup-prog"><i></i></div>
+          <p id="ai-checkup-msg" class="hint"></p>
+          <div id="ai-report" class="ai-report hidden"></div>
+        </div>
+
+        <!-- 运维问答 -->
+        <div class="panel ai-full">
+          <div class="p-head">
+            <span class="p-ico">✦</span>
+            <div class="p-t">
+              <h3>运维问答</h3>
+              <p class="hint">对话始终携带最新系统上下文，可直接询问「最近有什么风险」「WAF 该调成什么模式」等问题</p>
+            </div>
+            <span class="p-tag">CHAT</span>
+          </div>
+          <div id="ai-chat" class="ai-chat">
+            <div class="ai-empty hint">发起第一个问题，例如：最近有哪些需要注意的风险？</div>
+          </div>
+          <div class="ai-input-row">
+            <input id="ai-chat-input" placeholder="问问 AI 助手…（Enter 发送）"
+                   onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend();}">
+            <button class="btn primary" id="ai-send-btn" onclick="aiSend()">发送</button>
+          </div>
+          <div class="ai-progress hidden" id="ai-chat-prog"><i></i></div>
+          <p id="ai-chat-msg" class="hint"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section id="page-settings" class="page hidden">
+      <div class="page-head">
+        <h2>设置</h2>
+      </div>
+
+      <div class="set-grid">
+        <!-- 账号 -->
+        <div class="panel">
+          <div class="p-head">
+            <span class="p-ico">◉</span>
+            <div class="p-t">
+              <h3>账号与密码</h3>
+              <p class="hint">修改后台登录账号与密码</p>
+            </div>
+            <span class="p-tag">ACCOUNT</span>
+          </div>
+          <label>用户名 <input id="set-user"></label>
+          <label>旧密码 <input id="set-old" type="password"></label>
+          <label>新密码 <input id="set-new" type="password" placeholder="不修改则留空"></label>
+
+          <div class="p-sub">
+            <h4>后备账号（仅备份与还原权限）</h4>
+            <p class="hint">应急账号：登录后只能看到「配置备份与还原」，无法修改任何模块配置。用户名留空即禁用。</p>
+          </div>
+          <label>后备账号 <input id="set-backup-user" placeholder="留空禁用"></label>
+          <label>后备账号密码 <input id="set-backup-pass" type="password" placeholder="不修改则留空"></label>
+
+          <button class="btn primary" onclick="saveSettings()">保存</button>
+          <p id="set-msg" class="hint"></p>
+        </div>
+
+        <!-- 两步验证 -->
+        <div class="panel">
+          <div class="p-head">
+            <span class="p-ico">⛨</span>
+            <div class="p-t">
+              <h3>两步验证（2FA）</h3>
+              <p class="hint">启用后登录需额外输入验证器 App（Google Authenticator / Microsoft Authenticator / 1Password 等）中的 6 位动态验证码</p>
+            </div>
+            <span class="p-tag">2FA</span>
+          </div>
+          <div id="tfa-status-row" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span>当前状态</span><span id="tfa-badge" class="badge off">未启用</span>
+            <span id="tfa-recovery-left" class="hint" style="margin:0"></span>
+          </div>
+
+          <!-- 未启用：设置向导 -->
+          <div id="tfa-setup-box" class="hidden">
+            <button class="btn primary" id="tfa-gen-btn" onclick="tfaSetup()">开始设置</button>
+            <div id="tfa-setup-detail" class="hidden" style="margin-top:14px">
+              <p class="hint" style="margin-bottom:8px">1. 用验证器 App 扫描下方二维码，或手动输入密钥：</p>
+              <div style="text-align:center;margin:12px 0">
+                <div id="tfa-qr" style="display:inline-block;padding:12px;background:#fff;border:1px solid var(--border-light);border-radius:12px"></div>
+              </div>
+              <label>密钥（手动输入用） <input id="tfa-secret" readonly style="font-family:ui-monospace,monospace;letter-spacing:1px"></label>
+              <label>2. 输入 App 中显示的 6 位验证码以完成启用
+                <input id="tfa-verify-code" inputmode="numeric" maxlength="7" placeholder="6 位验证码"
+                       style="letter-spacing:5px;text-align:center;font-size:18px">
+              </label>
+              <button class="btn primary" onclick="tfaEnable()">启用两步验证</button>
+              <p id="tfa-setup-msg" class="hint"></p>
+            </div>
+          </div>
+
+          <!-- 已启用：恢复码 + 停用 -->
+          <div id="tfa-active-box" class="hidden">
+            <p class="hint" style="margin-bottom:10px">恢复码可在手机丢失时用于登录，每个只能用一次。</p>
+            <button class="btn" onclick="tfaShowRecovery()">查看恢复码</button>
+            <div id="tfa-recovery-list" class="hidden" style="margin-top:10px;font-family:ui-monospace,monospace;font-size:13px;line-height:2"></div>
+            <div class="p-sub">
+              <h4>停用两步验证</h4>
+            </div>
+            <label>当前密码 <input id="tfa-off-pass" type="password"></label>
+            <label>当前验证码 <input id="tfa-off-code" inputmode="numeric" maxlength="7" placeholder="6 位验证码"></label>
+            <button class="btn danger" onclick="tfaDisable()">停用</button>
+            <p id="tfa-off-msg" class="hint"></p>
+          </div>
+        </div>
+
+        <!-- 全局通知 -->
+        <div class="panel">
+          <div class="p-head">
+            <span class="p-ico">⌁</span>
+            <div class="p-t">
+              <h3>全局通知 Webhook</h3>
+              <p class="hint">接收所有模块的事件通知（DDNS 同步、端口转发异常、证书变化等）。单条规则的 Webhook 会在规则级额外发送</p>
+            </div>
+            <span class="p-tag">WEBHOOK</span>
+          </div>
+          <div id="global-wh-container"></div>
+          <button class="btn primary" onclick="saveGlobalWebhook()" style="margin-top:12px">保存全局通知</button>
+          <p id="global-wh-msg" class="hint"></p>
+        </div>
+
+        <!-- 配置备份与还原 -->
+        <div id="backup-block" class="panel">
+          <div class="p-head">
+            <span class="p-ico">⇩</span>
+            <div class="p-t">
+              <h3>配置备份与还原</h3>
+              <p class="hint">导出为单个 JSON 文件，包含全部模块配置（含账号密码、2FA 密钥与证书私钥，请妥善保管）。还原时会自动留存当前配置的副本，便于回滚</p>
+            </div>
+            <span class="p-tag">BACKUP</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+            <button class="btn primary" onclick="backupDownload()">导出配置备份</button>
+            <button class="btn" onclick="document.getElementById('backup-file').click()">选择文件还原</button>
+            <input type="file" id="backup-file" accept="application/json,.json" class="hidden" onchange="backupRestore(this.files[0])">
+          </div>
+          <div class="backup-drop" onclick="document.getElementById('backup-file').click()"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); backupRestore(event.dataTransfer.files[0])">
+            <div class="big">⇩</div>
+            <div style="margin-top:8px;font-size:13px">点击选择，或把备份 JSON 文件拖到这里</div>
+            <div class="hint" style="margin:6px 0 0">还原会覆盖当前全部配置并立即生效</div>
+          </div>
+          <p id="backup-msg" class="hint" style="margin-top:12px"></p>
+
+          <div class="p-sub">
+            <h4>本地自动备份</h4>
+            <p class="hint">每次还原前会自动保存一份当前配置副本。</p>
+          </div>
+          <div id="backup-list" style="font-size:12.5px"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- 通用弹窗 -->
+<dialog id="dlg" class="wide"></dialog>
+<dialog id="dlg2" class="wide"></dialog>
+
+<!-- DeepSeek 鲸鱼娘桌宠：顶层悬浮精灵（点击进入 AI 维护）
+     素材来源 aigengtu.com「小肥鱼 V4F」立绘，上善无形原角色 · ZipZipPipe 二创，CC BY-NC-SA 4.0，已去底 -->
+<div id="pet">
+  <div class="pet-bubble" id="pet-bubble" aria-hidden="true"></div>
+  <img class="pet-fish" src="pet.png" alt="" draggable="false" role="button" tabindex="0"
+       title="AI 小助手：DeepSeek 大肥鱼娘 · 素材 aigengtu.com（CC BY-NC-SA 4.0）"
+       aria-label="AI 小助手：DeepSeek 大肥鱼娘，点击进入 AI 维护">
+</div>
+
+<script src="app.js"></script>
+<script src="webhook-form.js"></script>
+<script src="stats.js"></script>
+<script src="bigscreen.js"></script>
+<script src="pages.js"></script>
+<script src="ai.js"></script>
+<script src="pet.js"></script>
+</body>
+</html>
